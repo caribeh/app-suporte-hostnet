@@ -1,0 +1,300 @@
+#!/bin/bash
+
+#################################-----                                        Programa feito por Bruno Caribé                                        -----################################
+#################################-----                                         Contato: bcaribe34@gmail.com                                          -----################################
+#################################-----                          Para funcionamento é necessário ter ZENITY e SSHPASS instalados                      -----################################
+#################################-----                                               Instale com:                                                    -----################################
+#################################-----                                      sudo apt-get -y install zenity                                           -----################################
+#################################-----                                      sudo apt-get -y install sshpass                                          -----################################
+
+
+
+
+#Início das funções sobre Banco de Dados
+
+pegadadosbd(){
+	#Função que recebe os dados de acesso ao banco de dados
+	unset servidorbd banco usuariobd senhabd
+
+	# Start=>0 Private=>1 na variável $?
+	zenity --question --width=250 --height=100 --title="Suporte Hostnet" --text="Qual é o tipo do banco?" --ok-label "START" --cancel-label "PRIVATE" 2>/dev/null
+	teste=$?
+	IFS='|' read servidorbd banco usuariobd senhabd < <( zenity --forms --width=200 --height=200 --text="Entre com os dados do banco" --title="Suporte Hostnet" --add-entry="NÚMERO do servidor" --add-entry="Digite o nome do banco" --add-entry="Usuário" --add-password="Senha" 2> /dev/null)	
+	if [ $servidorbd -ez ] 
+		then
+			zenity --warning --title="Suporte Hostnet" --text="Algum dado faltou! Voltando ao menu inicial" --timeout=3 2> /dev/null
+			main
+	fi
+}
+
+bancodedados(){
+	#Função agregadora das funções relativas a banco de dados
+	zenity --info --title="Suporte Hostnet" --width=400 --height=20 --text="NECESSÁRIO QUE O BANCO ESTEJA EM MODO LIVRE!" --timeout=3 2> /dev/null
+	pegadadosbd
+	unset escolhabd
+	until [ "$escolhabd" = 6 ]
+		do
+			escolhabd=$(zenity --title="Suporte Hostnet" --list --radiolist --text="Escolha a operação desejada" --width=340 --height=270 --print-column=2 --hide-column=2 --column="" --column="ID" --column="Operação" False 1 "Baixar um banco do servidor" FALSE 2 "Upar um banco para o servidor" FALSE 3 "Migrar conteúdo de um banco para outro" FALSE 4 "Alterar banco de dados" FALSE 5 "Voltar ao menu inicial" FALSE 6 "Sair do Programa" 2> /dev/null)
+			case $escolhabd in
+				1) exportabd;;
+				2) importabd;;
+				3) migrabd;;
+				4) pegadadosbd;;
+				5) main;;
+				6) exit;;
+				*) zenity --warning --title="Suporte Hostnet" --text="Opção inválida" --timeout=3 --height=100 --width=100 2> /dev/null;;
+			esac
+		done
+}
+
+exportabd(){
+	#esta função baixa um banco do servidor
+	zenity --info --title="Suporte Hostnet" --width=400 --height=20 --text="O ARQUIVO SERÁ EXPORTADO PARA A SUA PASTA PESSOAL" --timeout=3 2> /dev/null
+	
+		if [ "$teste" = 1 ]
+    		then
+    		mysqldump -cqKQ --extended-insert=FALSE --add-locks=FALSE --add-drop-table --user=$usuariobd --password=$senhabd --host=web$servidorbd.f1.k8.com.br $banco > $usuariobd.sql --verbose
+    	else
+    		mysqldump -cqKQ --extended-insert=FALSE --add-locks=FALSE --add-drop-table --user=$usuariobd --password=$senhabd --host=mysql$servidorbd.prv.f1.k8.com.br $banco > $usuariobd.sql --verbose
+	   	fi
+}
+
+importabd(){
+	#Esta função upa um banco para o servidor
+		arquivo=$(zenity --file-selection --title="Suporte Hostnet" 2> /dev/null)
+    	if [ "$teste" = 1 ]
+    		then
+    		mysql -h web$servidorbd.f1.k8.com.br -u $usuariobd -p$senhabd -D $banco < $arquivo --verbose
+    	else
+    		mysql -h mysql$servidorbd.prv.f1.k8.com.br -u $usuariobd -p$senhabd -D $banco < $arquivo --verbose
+    	fi
+}
+
+migrabd(){
+	#Esta função baixa o banco de dados para o PC, upa para o novo banco e depois apaga o arquivo do PC
+
+	# Start=>0 Private=>1 na variável $?
+	zenity --question --width=250 --height=100 --title="Suporte Hostnet" --text="Qual é o tipo do banco?" --ok-label "START" --cancel-label "PRIVATE" 2>/dev/null
+	teste2=$?
+	IFS='|' read servidorbd2 banco2 usuariobd2 senhabd2 < <( zenity --forms --width=200 --height=200 --title="Suporte Hostnet" --text="Entre com os dados do banco de DESTINO" --add-entry="NÚMERO do servidor" --add-entry="Digite o nome do banco" --add-entry="Usuário" --add-password="Senha" 2> /dev/null)	
+	if [ "$teste" = 1 ]
+    		then
+    		mysqldump -cqKQ --extended-insert=FALSE --add-locks=FALSE --add-drop-table --user=$usuariobd --password=$senhabd --host=web$servidorbd.f1.k8.com.br $banco > $usuariobd.sql --verbose
+    	else
+    		mysqldump -cqKQ --extended-insert=FALSE --add-locks=FALSE --add-drop-table --user=$usuariobd --password=$senhabd --host=mysql$servidorbd.prv.f1.k8.com.br $banco > $usuariobd.sql --verbose
+	fi
+	if [ "$teste2" = 1 ]
+    		then
+    		mysql -h web$servidorbd2.f1.k8.com.br -u $usuariobd2 -p$senhabd2 -D $banco2 < ~/$usuariobd.sql --verbose
+    	else
+    		mysql -h mysql$servidorbd2.prv.f1.k8.com.br -u $usuariobd2 -p$senhabd2 -D $banco2 < ~/$usuariobd.sql --verbose
+    fi
+    rm ~/$usuariobd.sql
+}
+
+#Fim das funções sobre Banco de Dados
+
+#Início das Funções sobre FTP
+
+FTP(){
+	#Função agregadora das funções relativas ao FTP
+	unset escolhaftp
+	pegadadosftp
+	until [ "$escolhaftp" = 14 ]
+		do
+			escolhaftp=$(zenity --title="Suporte Hostnet" --list --radiolist --text="Escolha a operação desejada" --width=340 --height=270 --print-column=2 --hide-column=2 --column="" --column="ID" --column="Operação" FALSE 1 "Conectar SSH" FALSE 2 "Verificar Quota" FALSE 3 "Corrigir permissões" FALSE 4 "Permissões de APPS" FALSE 5 "Troca de Plano" FALSE 6 "Migrar arquivos para site Extra Private" FALSE 7 "Antivírus" FALSE 8 "Procurar arquivos suspeitos" FALSE 9 "Enviar arquivo para o servidor" FALSE 10 "Procurar string nos arquivos" FALSE 11 "Zipar pasta www" FALSE 12 "Trocar FTP" FALSE 13 "Voltar ao menu Inicial" FALSE 14 "Sair" 2> /dev/null)
+			case $escolhaftp in
+				1)conectassh;;
+				2) quotaespaco;;
+				3) permissoes;;
+				4) permissoesapp;;
+				5) trocadeplano;;
+				6) transfpasta;;
+				7) antivirus;;
+				8) suspeito;;
+				9) enviararquivo;;
+				10) procura;;
+				11) ziparserver;;
+				12) pegadadosftp;;
+				13) main;;
+				14) exit;;
+				*) zenity --warning --title="Suporte Hostnet" --text="Opção inválida" --timeout=3 2> /dev/null
+			esac
+	done
+}
+
+
+pegadadosftp(){
+
+	unset servidorftp usuarioftp senhaftp
+
+	IFS='|' read servidorftp usuarioftp senhaftp < <( zenity --forms --title="Suporte Hostnet"--width=200 --height=200 --text="Digite os dados do FTP" --add-entry="NÚMERO do servidor" --add-entry="Usuário" --add-password="Senha" 2> /dev/null) 
+	if [ $servidorftp -ez ] 
+		then
+			zenity --warning --title="Suporte Hostnet" --text="Algum dado faltou! Voltando ao menu inicial" --timeout=3 2> /dev/null
+			main
+	fi
+
+}
+
+conectassh(){
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br
+}
+
+quotaespaco(){
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "quota -s; du -sh" > suporte.txt
+	zenity --text-info --title="Suporte Hostnet" --filename=suporte.txt  --width=500 --height=300 2> /dev/null
+	rm ~/suporte.txt
+}
+
+permissoes(){
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "find . -type f -exec chmod 644 '{}' \; | find . -type d -exec chmod 755 '{}' \;"
+}
+
+trocadeplano(){
+	servidorftpdestino=$(zenity --entry --title="Suporte Hostnet" --text="Digite o NÚMERO do servidor de destino" --width=300 --height=30 2> /dev/null) 
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "lftp -c 'lcd /home/$usuarioftp/ && open ftp://$usuarioftp:$senhaftp@web$servidorftpdestino.f1.k8.com.br/ && mirror -R --verbose'"
+}
+
+transfpasta(){
+	IFS='|' read serftpdest uftpdest seftpdest pastadestino < <( zenity --forms --title="Suporte Hostnet"--width=200 --height=200 --text="Digite os dados do FTP de DESTINO" --add-entry="NÚMERO do servidor" --add-entry="Usuário" --add-password="Senha" --add-entry="Pasta de destino" 2> /dev/null) 	
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "lftp -c 'lcd /home/$usuarioftp/www/ && open ftp://$uftpdest:$seftpdest@web$serftpdest.f1.k8.com.br/$pastadestino/ && mirror -R --verbose'"
+}
+
+antivirus(){
+	zenity --info --title="Suporte Hostnet" --text="Caso a janela apareça vazia, não há vírus" --width=300 --height=30 --timeout=3 2> /dev/null
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "clamscan -ri *" > suporte.txt
+	zenity --text-info --title="Suporte Hostnet" --filename=suporte.txt 2> /dev/null
+	rm ~/suporte.txt
+}
+
+suspeito(){
+	zenity --info --title="Suporte Hostnet" --text="Caso a janela apareça vazia, não há arquivos suspeitos" --width=300 --height=30 --timeout=3 2> /dev/null
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "find . -type f -name \*.suspected" > suporte.txt
+	zenity --text-info --title="Suporte Hostnet" --filename=suporte.txt 2> /dev/null
+}
+
+procura(){
+	texto=$(zenity --entry --title="Suporte Hostnet" --text="Digite a palavra ou texto que deseja procurar" 2> /dev/null)
+	zenity --info --title="Suporte Hostnet" --text="Caso a janela apareça vazia, não há esta string nos arquivos" --width=300 --height=30 --timeout=3 2> /dev/null
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br > suporte.txt
+	zenity --text-info --title="Suporte Hostnet" --filename=suporte.txt 2> /dev/null
+
+}
+enviararquivo(){
+	# Start=>0 Private=>1 na variável $?
+	zenity --question --width=250 --height=100 --title="Suporte Hostnet" --text="O que vai enviar?" --ok-label "Arquivo" --cancel-label "Pasta" 2>/dev/null
+	escolha=$?
+	case $escolha in
+		0) arquivo=$(zenity --file-selection 2> /dev/null);;
+		1) arquivo=$(zenity --file-selection --directory 2> /dev/null);;
+		*) zenity --warning --title="Suporte Hostnet" --text="Opção inválida" --timeout=3 --height=100 --width=100 2> /dev/null;;
+	esac
+	sshpass -p "$senhaftp" scp -rp $arquivo $usuarioftp@web$servidorftp.f1.k8.com.br:/home/$usuarioftp
+}
+
+permissoesapp(){
+	opcao=$(zenity --title="Suporte Hostnet" --list --radiolist --text="Escolha o APP" --width=340 --height=270 --print-column=2 --hide-column=2 --column="" --column="ID" --column="Escolha" FALSE 1 WORDPRESS FALSE 2 PRESTASHOP FALSE 3 JOOMLA FALSE 4 "Voltar ao menu anterior" FALSE 5 Voltar ao menu inicial FALSE 6 Sair 2> /dev/null)
+	case $opcao in
+		1) wordpress;;
+		2) prestashop;;
+		3) joomla;;
+		4) FTP;;
+		5) main;;
+		6) exit;;
+		*) zenity --warning --title="Suporte Hostnet" --text="Opção inválida" --timeout=3 --height=100 --width=100 2> /dev/null;;
+	esac
+}
+
+wordpress(){
+	caminho=$(zenity --entry --title="Suporte Hostnet" --text="Digite o caminho da instalação. Caso esteja na WWW escreva www" 2> /dev/null)
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "chmod -R 777 /home/$usuario/$caminho/wp-includes; chmod -R 777 /home/$usuario/$caminho/wp-content; chmod -R 777 /home/$usuario/$caminho/wp-admin/includes; chmod -R 777 /home/$usuario/$caminho/wp-admin/images"
+
+}
+
+prestashop(){
+	caminho=$(zenity --entry --title="Suporte Hostnet" --text="Digite o caminho da instalação. Caso esteja na WWW escreva www" 2> /dev/null)
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "chmod -R 777 /home/$usuario/$caminho/cache; chmod -R 777 /home/$usuario/$caminho/log; chmod -R 777 /home/$usuario/$caminho/config; chmod -R 777 /home/$usuario/$caminho/modules; chmod -R 777 /home/$usuario/$caminho/override; chmod -R 777 /home/$usuario/$caminho/translations; chmod -R 777 /home/$usuario/$caminho/upload; chmod -R 777 /home/$usuario/$caminho/download; chmod -R 777 /home/$usuario/$caminho/mails; chmod -R 777 /home/$usuario/$caminho/themes"
+
+}
+
+joomla() {
+	caminho=$(zenity --entry --title="Suporte Hostnet" --text="Digite o caminho da instalação. Caso esteja na WWW escreva www" 2> /dev/null) 
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "chmod -R 777 /home/$usuario/$caminho/administrator/backups; chmod -R 777 /home/$usuario/$caminho/administrator/components; chmod -R 777 /home/$usuario/$caminho/administrator/language; chmod -R 777 /home/$usuario/$caminho/administrator/modules; chmod -R 777 /home/$usuario/$caminho/administrator/templates;chmod -R 777 /home/$usuario/$caminho/components; chmod -R 777 /home/$usuario/$caminho/images; chmod -R 777 /home/$usuario/$caminho/language; chmod -R 777 /home/$usuario/$caminho/modules; chmod -R 777 /home/$usuario/$caminho/plugins; chmod -R 777 /home/$usuario/$caminho/tmp; chmod -R 777 /home/$usuario/$caminho/templates; chmod -R 777 /home/$usuario/$caminho/cache"
+}
+
+ziparserver(){
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "zip -r $usuarioftp.zip www"
+}
+
+#Fim das Funções sobre FTP
+
+#Início das Funções sobre Domínio
+
+pegadadosdominio(){
+	unset dominio
+
+	dominio=$(zenity --entry --title="Suporte Hostnet" --height=100 --width=150 --text="Digite o domínio" 2> /dev/null)
+}
+
+domi(){
+	#Função agregadora das funções relativas a domínio
+	unset escolhadominio
+	pegadadosdominio
+	until [ "$escolhadominio" = 5 ]
+		do
+			escolhadominio=$(zenity --title="Suporte Hostnet" --list --radiolist --text="Escolha a operação" --width=340 --height=270 --print-column=2 --hide-column=2 --column="" --column="ID" --column="Escolha" FALSE 1 "Whois" FALSE 2 "Configuração de e-mail" FALSE 3 "Trocar domínio" FALSE 4 "Voltar ao menu Inicial" FALSE 5 "Sair" 2> /dev/null)
+			case $escolhadominio in
+				1) pesquisadominio;;
+				2) testaemail;;
+				3) pegadadosdominio;;
+				4) main;;
+				5) exit;;
+				*) zenity --warning --title="Suporte Hostnet" --text="Opção inválida" --timeout=3 --height=100 --width=100 2> /dev/null;;
+			esac
+	done
+
+}
+
+testaemail(){
+	zenity --info --title="Suporte Hostnet" --height=180 --width=300 --timeout=5 --text="Caso não apareça informações sobre MBOX e SMTP, o domínio não possui os subdomínios cadastrados." 2> /dev/null
+	ping -c 1 mbox.$dominio > suporte.txt
+	ping -c 1 smtp.$dominio >> suporte.txt
+	host -t mx $dominio >> suporte.txt
+	host -t txt $dominio >> suporte.txt
+	zenity --text-info --title="Suporte Hostnet" --filename=suporte.txt --height=500 --width=500 2> /dev/null
+
+}
+
+pesquisadominio(){
+	whois $dominio > suporte.txt
+	zenity --text-info --title="Suporte Hostnet" --filename=suporte.txt --height=500 --width=500 2> /dev/null
+}
+
+#Fim das funções sobre domínio
+
+#Início da função MAIN
+
+main(){
+	unset escolhaprincipal
+	until [ "$escolhaprincipal" = 4 ]
+		do
+			escolhaprincipal=$(zenity --title="Suporte Hostnet" --list --radiolist --text="Escolha a operação desejada" --width=340 --height=270 --print-column=2 --hide-column=2 --column="" --column="ID" --column="Operação" False 1 "Operações com FTP" FALSE 2 "Operações com Banco de dados" FALSE 3 "Operações com domínio" FALSE 4 "Sair" 2> /dev/null)
+			case $escolhaprincipal in
+				1) FTP;;
+				2) bancodedados;;
+				3) domi;;
+				4) exit;;
+				*) zenity --warning --title="Suporte Hostnet" --text="Opção inválida" --timeout=3 --height=100 --width=100 2> /dev/null;;
+			esac
+	done
+
+}
+
+#Fim da função MAIN
+
+#Início do Programa
+zenity --info --title="Suporte Hostnet" --width=400 --height=20 --text="Sugestões e Bugs favor reportar a bruno.caribe@hostnet.com.br" --timeout=5 2> /dev/null
+main
+
+#Fim do Programa

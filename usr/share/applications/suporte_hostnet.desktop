@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Suporte Hostnet
+Comment=Rotinas do suporte
+Exec=/opt/suporte_hostnet/suporte
+Icon=/opt/suporte_hostnet/suporte.xpm
+Terminal=true
+Type=Application
+Name[en_US]=Suporte Hostnet
+Name[pt_BR]=Suporte Hostnet
+Categories=Development;
