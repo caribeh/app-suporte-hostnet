@@ -1,9 +1,9 @@
 Package: app-suporte
 Priority: optional
-Version: 1.1
+Version: 1.2
 Architecture: all
 Maintainer: Bruno Caribé
 Depends: sshpass, zenity
 Description: App essencial para o suporte Hostnet
 
-.
+
