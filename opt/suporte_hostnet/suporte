@@ -208,19 +208,19 @@ permissoesapp(){
 
 wordpress(){
 	caminho=$(zenity --entry --title="Suporte Hostnet" --text="Digite o caminho da instalação. Caso esteja na WWW escreva www" 2> /dev/null)
-	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "chmod -R 777 /home/$usuarioftp/$caminho/wp-includes; chmod -R 777 /home/$usuario/$caminho/wp-content; chmod -R 777 /home/$usuario/$caminho/wp-admin/includes; chmod -R 777 /home/$usuario/$caminho/wp-admin/images"
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "chmod -R 777 /home/$usuarioftp/$caminho/wp-includes; chmod -R 777 /home/$usuarioftp/$caminho/wp-content; chmod -R 777 /home/$usuarioftp/$caminho/wp-admin/includes; chmod -R 777 /home/$usuarioftp/$caminho/wp-admin/images"
 
 }
 
 prestashop(){
 	caminho=$(zenity --entry --title="Suporte Hostnet" --text="Digite o caminho da instalação. Caso esteja na WWW escreva www" 2> /dev/null)
-	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "chmod -R 777 /home/$usuarioftp/$caminho/cache; chmod -R 777 /home/$usuario/$caminho/log; chmod -R 777 /home/$usuario/$caminho/config; chmod -R 777 /home/$usuario/$caminho/modules; chmod -R 777 /home/$usuario/$caminho/override; chmod -R 777 /home/$usuario/$caminho/translations; chmod -R 777 /home/$usuario/$caminho/upload; chmod -R 777 /home/$usuario/$caminho/download; chmod -R 777 /home/$usuario/$caminho/mails; chmod -R 777 /home/$usuario/$caminho/themes"
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "chmod -R 777 /home/$usuarioftp/$caminho/cache; chmod -R 777 /home/$usuarioftp/$caminho/log; chmod -R 777 /home/$usuarioftp/$caminho/config; chmod -R 777 /home/$usuarioftp/$caminho/modules; chmod -R 777 /home/$usuarioftp/$caminho/override; chmod -R 777 /home/$usuarioftp/$caminho/translations; chmod -R 777 /home/$usuarioftp/$caminho/upload; chmod -R 777 /home/$usuarioftp/$caminho/download; chmod -R 777 /home/$usuarioftp/$caminho/mails; chmod -R 777 /home/$usuarioftp/$caminho/themes"
 
 }
 
 joomla() {
 	caminho=$(zenity --entry --title="Suporte Hostnet" --text="Digite o caminho da instalação. Caso esteja na WWW escreva www" 2> /dev/null) 
-	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "chmod -R 777 /home/$usuarioftp/$caminho/administrator/backups; chmod -R 777 /home/$usuario/$caminho/administrator/components; chmod -R 777 /home/$usuario/$caminho/administrator/language; chmod -R 777 /home/$usuario/$caminho/administrator/modules; chmod -R 777 /home/$usuario/$caminho/administrator/templates;chmod -R 777 /home/$usuario/$caminho/components; chmod -R 777 /home/$usuario/$caminho/images; chmod -R 777 /home/$usuario/$caminho/language; chmod -R 777 /home/$usuario/$caminho/modules; chmod -R 777 /home/$usuario/$caminho/plugins; chmod -R 777 /home/$usuario/$caminho/tmp; chmod -R 777 /home/$usuario/$caminho/templates; chmod -R 777 /home/$usuario/$caminho/cache"
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "chmod -R 777 /home/$usuarioftp/$caminho/administrator/backups; chmod -R 777 /home/$usuarioftp/$caminho/administrator/components; chmod -R 777 /home/$usuarioftp/$caminho/administrator/language; chmod -R 777 /home/$usuarioftp/$caminho/administrator/modules; chmod -R 777 /home/$usuarioftp/$caminho/administrator/templates;chmod -R 777 /home/$usuarioftp/$caminho/components; chmod -R 777 /home/$usuarioftp/$caminho/images; chmod -R 777 /home/$usuarioftp/$caminho/language; chmod -R 777 /home/$usuarioftp/$caminho/modules; chmod -R 777 /home/$usuarioftp/$caminho/plugins; chmod -R 777 /home/$usuarioftp/$caminho/tmp; chmod -R 777 /home/$usuarioftp/$caminho/templates; chmod -R 777 /home/$usuarioftp/$caminho/cache"
 }
 
 ziparserver(){
