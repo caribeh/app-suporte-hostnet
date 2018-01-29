@@ -1,6 +1,6 @@
 Package: app-suporte
 Priority: optional
-Version: 1.2
+Version: 1.21
 Architecture: all
 Maintainer: Bruno Caribé
 Depends: sshpass, zenity
