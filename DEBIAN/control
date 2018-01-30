@@ -1,9 +1,9 @@
 Package: app-suporte
 Priority: optional
-Version: 1.21
+Version: 1.31
 Architecture: all
 Maintainer: Bruno Caribé
-Depends: sshpass, zenity
+Depends: sshpass, zenity, whois, mysql-client, dig, host
 Description: App essencial para o suporte Hostnet
 
 
