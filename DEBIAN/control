@@ -3,7 +3,7 @@ Priority: optional
 Version: 1.32
 Architecture: all
 Maintainer: Bruno Caribé
-Depends: sshpass, zenity, whois, mysql-client, dig, host
+Depends: sshpass, zenity, whois, mysql-client
 Description: App essencial para o suporte Hostnet
 
 
