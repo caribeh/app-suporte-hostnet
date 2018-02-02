@@ -70,9 +70,9 @@ exportabd(){
 	
 		if [ "$testebd" = 1 ]
     		then
-    		mysqldump -cqKQ --extended-insert=FALSE --add-locks=FALSE --add-drop-table --user=$usuariobd --password=$senhabd --host=web$servidorbd.f1.k8.com.br $banco > $usuariobd.sql --verbose 2> /dev/null
+    		mysqldump -cqKQ --extended-insert=FALSE --add-locks=FALSE --add-drop-table --user=$usuariobd --password=$senhabd --host=web$servidorbd.f1.k8.com.br $banco > $usuariobd.sql --verbose 
     	else
-    		mysqldump -cqKQ --extended-insert=FALSE --add-locks=FALSE --add-drop-table --user=$usuariobd --password=$senhabd --host=mysql$servidorbd.prv.f1.k8.com.br $banco > $usuariobd.sql --verbose 2> /dev/null
+    		mysqldump -cqKQ --extended-insert=FALSE --add-locks=FALSE --add-drop-table --user=$usuariobd --password=$senhabd --host=mysql$servidorbd.prv.f1.k8.com.br $banco > $usuariobd.sql --verbose 
 	   	fi
 }
 
@@ -81,9 +81,9 @@ importabd(){
 		arquivo=$(zenity --file-selection --title="Suporte Hostnet" 2> /dev/null)
     	if [ "$testebd" = 1 ]
     		then
-    		mysql -h web$servidorbd.f1.k8.com.br -u $usuariobd -p$senhabd -D $banco < $arquivo --verbose 2> /dev/null
+    		mysql -h web$servidorbd.f1.k8.com.br -u $usuariobd -p$senhabd -D $banco < $arquivo --verbose 
     	else
-    		mysql -h mysql$servidorbd.prv.f1.k8.com.br -u $usuariobd -p$senhabd -D $banco < $arquivo --verbose 2> /dev/null
+    		mysql -h mysql$servidorbd.prv.f1.k8.com.br -u $usuariobd -p$senhabd -D $banco < $arquivo --verbose 
     	fi
 }
 
@@ -96,9 +96,9 @@ migrabd(){
 	IFS='|' read servidorbd2 banco2 usuariobd2 senhabd2 < <( zenity --forms --width=200 --height=200 --title="Suporte Hostnet" --text="Entre com os dados do banco de DESTINO" --add-entry="NÚMERO do servidor" --add-entry="Digite o nome do banco" --add-entry="Usuário" --add-password="Senha" 2> /dev/null)	
 	if [ "$testebd" = 1 ]
     		then
-    		mysqldump -cqKQ --extended-insert=FALSE --add-locks=FALSE --add-drop-table --user=$usuariobd --password=$senhabd --host=web$servidorbd.f1.k8.com.br $banco > $usuariobd.sql --verbose 2> /dev/null
+    		mysqldump -cqKQ --extended-insert=FALSE --add-locks=FALSE --add-drop-table --user=$usuariobd --password=$senhabd --host=web$servidorbd.f1.k8.com.br $banco > $usuariobd.sql --verbose 
     	else
-    		mysqldump -cqKQ --extended-insert=FALSE --add-locks=FALSE --add-drop-table --user=$usuariobd --password=$senhabd --host=mysql$servidorbd.prv.f1.k8.com.br $banco > $usuariobd.sql --verbose 2> /dev/null
+    		mysqldump -cqKQ --extended-insert=FALSE --add-locks=FALSE --add-drop-table --user=$usuariobd --password=$senhabd --host=mysql$servidorbd.prv.f1.k8.com.br $banco > $usuariobd.sql --verbose 
 	fi
 	if [ "$testebd2" = 1 ]
     		then
@@ -239,7 +239,7 @@ suspeito(){
 procura(){
 	texto=$(zenity --entry --title="Suporte Hostnet" --text="Digite a palavra ou texto que deseja procurar" 2> /dev/null)
 	zenity --info --title="Suporte Hostnet" --text="Caso a janela apareça vazia, não há esta string nos arquivos" --width=300 --height=30 --timeout=3 2> /dev/null
-	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br > .suporte.txt
+	sshpass -p "$senhaftp" ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $usuarioftp@web$servidorftp.f1.k8.com.br "find ./* -type f -exec grep -l $texto {} \;" > .suporte.txt
 	zenity --text-info --title="Suporte Hostnet" --filename=.suporte.txt 2> /dev/null
 	rm ~/.suporte.txt
 
@@ -341,13 +341,11 @@ testaemail(){
 	tamanhodominio=${#dominio}
 	echo "" >> .suporte.txt
 	STR=$(ping -c 1 mbox.$dominio)
-	echo "Servidor de Entrada: " ${STR:$tamanhodominio+63:5} >> .suporte.txt
+	echo "Servidor de Entrada: " ${STR:$tamanhodominio+62:5} >> .suporte.txt
 	STR=$(ping -c 1 smtp.$dominio)
-	echo "Servidor de saída: " ${STR:$tamanhodominio+63:5} >> .suporte.txt
-	STR=$(host -t mx $dominio)
-	echo "MX: " ${STR:$tamanhodominio+19:25} >> .suporte.txt
-	STR=$(host -t txt $dominio)
-	echo "SPF: " ${STR:$tamanhodominio+19:30} >> .suporte.txt
+	echo "Servidor de saída: " ${STR:$tamanhodominio+62:5} >> .suporte.txt
+	echo "MX: " $(dig +short $dominio mx) >> .suporte.txt
+	echo "TXT: " $(dig +short $dominio txt) >> .suporte.txt
 	zenity --text-info --title="Suporte Hostnet" --filename=.suporte.txt --height=500 --width=500 2> /dev/null
 	rm ~/.suporte.txt
 	
@@ -375,13 +373,11 @@ dominiocompleto(){
 	echo "Serviço de e-mail" >> .suporte.txt
 	echo "" >> .suporte.txt
 	STR=$(ping -c 1 mbox.$dominio)
-	echo "Servidor de Entrada: " ${STR:$tamanhodominio+63:5} >> .suporte.txt
+	echo "Servidor de Entrada: " ${STR:$tamanhodominio+62:5} >> .suporte.txt
 	STR=$(ping -c 1 smtp.$dominio)
-	echo "Servidor de saída: " ${STR:$tamanhodominio+63:5} >> .suporte.txt
-	STR=$(host -t mx $dominio)
-	echo "MX: " ${STR:$tamanhodominio+19:25} >> .suporte.txt
-	STR=$(host -t txt $dominio)
-	echo "SPF: " ${STR:$tamanhodominio+19:30} >> .suporte.txt
+	echo "Servidor de saída: " ${STR:$tamanhodominio+62:5} >> .suporte.txt
+	echo "MX: " $(dig +short $dominio mx) >> .suporte.txt
+	echo "TXT: " $(dig +short $dominio txt) >> .suporte.txt
 	zenity --text-info --title="Suporte Hostnet" --filename=.suporte.txt --height=500 --width=500 2> /dev/null
 	rm ~/.suporte.txt
 
